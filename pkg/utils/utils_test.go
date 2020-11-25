@@ -1,4 +1,4 @@
-package main
+package utils
 
 import (
 	"reflect"
@@ -7,8 +7,11 @@ import (
 
 var files = []string{"go.mod", "main.go", "main_test.go"}
 
-func Test_search(t *testing.T) {
-	expectedFiles := listDirectory(".")
+func Test_listDirectory(t *testing.T) {
+	expectedFiles, err := ListDirectory(".")
+	if err != nil {
+		t.Fatal(err)
+	}
 	if !reflect.DeepEqual(expectedFiles, files) {
 		t.Fatal("not match expected result")
 	}
