@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	toolsutils "github.com/yametech/cloud-native-tools/pkg/utils"
+	utils "github.com/yametech/cloud-native-tools/pkg/utils"
 	"html/template"
 	"io"
 	"io/ioutil"
@@ -17,7 +17,7 @@ func main() {
 	flag.StringVar(&file, "f", "*.conf", "-f xx.conf")
 	flag.Parse()
 
-	rc, config, err := toolsutils.ReadAll(file)
+	rc, config, err := utils.ReadAll(file)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -28,7 +28,7 @@ func main() {
 
 	configTemplate := template.New("config")
 	configTemplate = template.Must(configTemplate.Parse(string(config)))
-	variables := toolsutils.FindVariables(string(config))
+	variables := utils.FindVariables(string(config))
 	args := make(map[string]interface{})
 	for _, key := range variables {
 		value := os.Getenv(key)
