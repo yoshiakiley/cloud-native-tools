@@ -6,12 +6,14 @@ import (
 	"html/template"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"regexp"
 	"strings"
 )
 
 var file string
+var dir string
 
 func main() {
 	flag.StringVar(&file, "f", "*.conf", "-f xx.conf")
@@ -40,8 +42,7 @@ func main() {
 	if err := configTemplate.Execute(output, args); err != nil {
 		panic(err)
 	}
-	fmt.Printf("output--------------"+
-		"%s\n", output.data)
+	fmt.Printf("output--------------"+"%s\n", output.data)
 
 	if err := ioutil.WriteFile(file, output.data, 0777); err != nil {
 		panic(err)
@@ -75,4 +76,24 @@ func findVariables(data string) []string {
 		result = append(result, strings.TrimLeft(strings.TrimRight(strings.TrimLeft(key, "{"), "}"), "."))
 	}
 	return result
+}
+
+// listDirectory list all path return the file name but not include file full path
+// ignore the hide file
+func listDirectory(paths ...string) []string {
+	all := make([]string, 0)
+	for _, path := range paths {
+		files, err := ioutil.ReadDir(path)
+		if err != nil {
+			log.Fatal(err)
+		}
+		for _, file := range files {
+			// ignore hide
+			if strings.HasPrefix(file.Name(), ".") {
+				continue
+			}
+			all = append(all, file.Name())
+		}
+	}
+	return all
 }
