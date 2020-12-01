@@ -28,7 +28,6 @@ func ListDirectory(paths ...string) ([]string, error) {
 	return all, nil
 }
 
-
 func ReadAll(file string) (io.WriteCloser, []byte, error) {
 	f, err := os.OpenFile(file, os.O_RDWR, 0777)
 	if err != nil {
