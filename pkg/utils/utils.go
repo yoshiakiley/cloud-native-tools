@@ -28,7 +28,6 @@ func ListDirectory(paths ...string) ([]string, error) {
 	return all, nil
 }
 
-
 func ReadAll(file string) (io.WriteCloser, []byte, error) {
 	f, err := os.OpenFile(file, os.O_RDWR, 0777)
 	if err != nil {
@@ -45,4 +44,16 @@ func FindVariables(data string) []string {
 		result = append(result, strings.TrimLeft(strings.TrimRight(strings.TrimLeft(key, "{"), "}"), "."))
 	}
 	return result
+}
+
+func GenerateFile(filename string, content string) error {
+	f, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	_, err = io.WriteString(f, content)
+	if err != nil {
+		return err
+	}
+	return nil
 }
