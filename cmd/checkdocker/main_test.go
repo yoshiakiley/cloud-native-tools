@@ -8,10 +8,7 @@ import (
 
 func Test_CheckDockerFile(t *testing.T) {
 	dir, err := ioutil.TempDir(".", "tmp")
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = CheckDockerFile(dir, "django")
+	defer os.RemoveAll(dir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -23,12 +20,14 @@ func Test_CheckDockerFile(t *testing.T) {
 }
 
 func Test_djangoDocker(t *testing.T) {
-	err := djangoDocker("./Dockerfile")
+	dockerFile := "./Dockerfile"
+	err := djangoDocker(dockerFile)
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer os.Remove(dockerFile)
 	var exist = true
-	if _, err := os.Stat("./Dockerfile"); os.IsNotExist(err) {
+	if _, err := os.Stat(dockerFile); os.IsNotExist(err) {
 		exist = false
 	}
 	if !exist {
