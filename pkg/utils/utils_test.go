@@ -1,23 +1,26 @@
 package utils
 
 import (
+	"io/ioutil"
 	"reflect"
+	"strings"
 	"testing"
 )
 
-var files = []string{"go.mod", "main.go", "main_test.go"}
-
 func Test_listDirectory(t *testing.T) {
-	//dirName, err := ioutil.TempDir("", "*.go")
-	//if err != nil {
-	//	t.Fatal(err)
-	//}
+	var files = []string{"test.conf"}
 
-	expectedFiles, err := ListDirectory(".")
+	dir, err := ioutil.TempDir(".", "tmp")
 	if err != nil {
 		t.Fatal(err)
 	}
-
+	if err := ioutil.WriteFile(strings.Join([]string{dir, "test.conf"}, "/"), []byte(""), 0777); err != nil {
+		t.Fatal(err)
+	}
+	expectedFiles, err := ListDirectory(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
 	if !reflect.DeepEqual(expectedFiles, files) {
 		t.Fatal("not match expected result")
 	}
