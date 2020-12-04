@@ -28,7 +28,7 @@ http {
 }
 `
 
-const expect_nginx = `
+const expected = `
 http {
     server {
         listen       80 default_server;
@@ -44,7 +44,7 @@ http {
         }
 
     upstream backend {
-    	server {{.UPSTREAM}} weight=2 max_fails=3 fail_timeout=3s;
+    	server gateway.service.ym:2000 weight=2 max_fails=3 fail_timeout=3s;
     }
 }
 `
@@ -57,14 +57,17 @@ func Test_renderNginxConfig(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer os.RemoveAll(dir)
+
 	tempConf := strings.Join([]string{dir, "nginx.conf"}, "/")
 	if err := ioutil.WriteFile(tempConf, []byte(nginx), 0777); err != nil {
 		t.Fatal(err)
 	}
-	if err := render(tempConf); err != nil {
+	output, err := render(tempConf)
+	if err != nil {
 		t.Fatal(err)
 	}
-	if strings.Compare(expect_nginx, nginx) > 0 {
+	if strings.Compare(expected, output) != 0 {
 		t.Fatal("compare not expected")
 	}
 }

@@ -19,19 +19,19 @@ func main() {
 		fmt.Printf("render not working.\n")
 		return
 	}
-	if err := render(file); err != nil {
+	if _, err := render(file); err != nil {
 		fmt.Printf("render file %s error %s\n", file, err)
 		os.Exit(1)
 	}
 }
 
-func render(file string) error {
+func render(file string) (string, error) {
 	rc, config, err := utils.ReadAll(file)
 	if err != nil {
-		return err
+		return "", err
 	}
 	if err := rc.Close(); err != nil {
-		return err
+		return "", err
 	}
 	configTemplate := template.New("config")
 	configTemplate = template.Must(configTemplate.Parse(string(config)))
@@ -45,14 +45,13 @@ func render(file string) error {
 	}
 	output := &output{}
 	if err := configTemplate.Execute(output, args); err != nil {
-		return err
+		return "", err
 	}
-	fmt.Printf("output--------------"+"%s\n", output.data)
 
 	if err := ioutil.WriteFile(file, output.data, 0777); err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	return string(output.data), nil
 }
 
 var _ io.Writer = &output{}
