@@ -45,3 +45,15 @@ func FindVariables(data string) []string {
 	}
 	return result
 }
+
+func GenerateFile(filename string, content string) error {
+	f, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	_, err = io.WriteString(f, content)
+	if err != nil {
+		return err
+	}
+	return nil
+}
