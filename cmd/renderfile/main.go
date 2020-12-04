@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	utils "github.com/yametech/cloud-native-tools/pkg/utils"
+	"github.com/yametech/cloud-native-tools/pkg/utils"
 	"html/template"
 	"io"
 	"io/ioutil"
@@ -11,21 +11,28 @@ import (
 )
 
 var file string
-var dir string
 
 func main() {
-	flag.StringVar(&file, "f", "*.conf", "-f xx.conf")
+	flag.StringVar(&file, "f", "*.conf", "-f nginx.conf")
 	flag.Parse()
-
-	rc, config, err := utils.ReadAll(file)
-	if err != nil {
-		fmt.Println(err)
+	if file == "" {
+		fmt.Printf("render not working.\n")
 		return
 	}
-	if err := rc.Close(); err != nil {
-		panic(err)
+	if err := render(file); err != nil {
+		fmt.Printf("render file %s error %s\n", file, err)
+		os.Exit(1)
 	}
+}
 
+func render(file string) error {
+	rc, config, err := utils.ReadAll(file)
+	if err != nil {
+		return err
+	}
+	if err := rc.Close(); err != nil {
+		return err
+	}
 	configTemplate := template.New("config")
 	configTemplate = template.Must(configTemplate.Parse(string(config)))
 	variables := utils.FindVariables(string(config))
@@ -38,13 +45,14 @@ func main() {
 	}
 	output := &output{}
 	if err := configTemplate.Execute(output, args); err != nil {
-		panic(err)
+		return err
 	}
 	fmt.Printf("output--------------"+"%s\n", output.data)
 
 	if err := ioutil.WriteFile(file, output.data, 0777); err != nil {
-		panic(err)
+		return err
 	}
+	return nil
 }
 
 var _ io.Writer = &output{}
