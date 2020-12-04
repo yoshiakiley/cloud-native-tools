@@ -73,7 +73,7 @@ RUN mvn install
 
 # # Step : Package image
 FROM harbor.ym/devops/openjdk8:latest
-COPY --from=builder /build/idmp-api/target/* /app/
+COPY --from=builder /build/*/target/* /app/
 ENTRYPOINT ["/app/bin/run.sh"]
 `
 
