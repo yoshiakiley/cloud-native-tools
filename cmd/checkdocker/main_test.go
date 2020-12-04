@@ -33,5 +33,20 @@ func Test_djangoDocker(t *testing.T) {
 	if !exist {
 		t.Fatal("not match expected result")
 	}
+}
 
+func Test_webDocker(t *testing.T) {
+	dockerFile := "./Dockerfile"
+	err := webDocker(dockerFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.Remove(dockerFile)
+	var exist = true
+	if _, err := os.Stat(dockerFile); os.IsNotExist(err) {
+		exist = false
+	}
+	if !exist {
+		t.Fatal("not match expected result")
+	}
 }
