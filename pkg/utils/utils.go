@@ -51,6 +51,9 @@ func GenerateFile(filename string, content string) error {
 	if err != nil {
 		return err
 	}
+	if f != nil{
+		defer f.Close()
+	}
 	_, err = io.WriteString(f, content)
 	if err != nil {
 		return err
