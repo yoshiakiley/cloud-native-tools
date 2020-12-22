@@ -50,3 +50,21 @@ func Test_webDocker(t *testing.T) {
 		t.Fatal("not match expected result")
 	}
 }
+
+func Test_easyswooleDocker(t *testing.T)  {
+	dockerfile := "./Dockerfile"
+	err := easyswooleDocker(dockerfile)
+	if err != nil{
+		t.Fatal(err)
+	}else {
+		defer os.Remove(dockerfile)
+	}
+
+	var exist = true
+	if _,err := os.Stat(dockerfile); os.IsNotExist(err){
+		exist = false
+	}
+	if !exist {
+		t.Fatal("not match expected result")
+	}
+}
