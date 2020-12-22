@@ -32,7 +32,7 @@ func CheckDockerFile(url string, codeType string) error {
 		if err != nil {
 			return err
 		}
-	case "java":
+	case "java-maven":
 		err := javaDocker(url)
 		if err != nil {
 			return err
