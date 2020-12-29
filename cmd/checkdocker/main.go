@@ -3,28 +3,31 @@ package main
 import (
 	"flag"
 	"fmt"
-	utils "github.com/yametech/cloud-native-tools/pkg/utils"
 	"os"
 	"path"
 	"strings"
+
+	utils "github.com/yametech/cloud-native-tools/pkg/utils"
 )
 
 func main() {
 	var url string
 	var codeType string
+	var projectPath string
 
 	flag.StringVar(&url, "url", "./", "-url ./")
-	flag.StringVar(&codeType, "codetype", "java", "-codetype java")
+	flag.StringVar(&codeType, "codetype", "java-maven", "-codetype java-maven")
+	flag.StringVar(&projectPath, "path", "", "-path subdirectory")
 	flag.Parse()
 
 	fmt.Printf("url=%v  codeType=%v\n", url, codeType)
-	err := CheckDockerFile(url, codeType)
+	err := CheckDockerFile(url, codeType, projectPath)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func CheckDockerFile(url string, codeType string) error {
+func CheckDockerFile(url string, codeType string, projectPath string) error {
 	url = path.Join(url, "Dockerfile")
 	switch codeType {
 	case "django":
@@ -33,15 +36,15 @@ func CheckDockerFile(url string, codeType string) error {
 			return err
 		}
 	case "java-maven":
-		err := javaDocker(url)
+		err := javaDocker(url, projectPath)
 		if err != nil {
 			return err
 		}
 	case "easyswoole":
 		err := easyswooleDocker(url)
-		if err != nil{
-      return err
-    }
+		if err != nil {
+			return err
+		}
 	case "web":
 		err := webDocker(url)
 		if err != nil {
@@ -174,7 +177,7 @@ COPY --from=builder app/nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 80
 `
-	if _, err:= os.Stat(url); os.IsNotExist(err) {
+	if _, err := os.Stat(url); os.IsNotExist(err) {
 		err = utils.GenerateFile(url, content)
 		if err != nil {
 			return err
@@ -207,8 +210,17 @@ CMD python manage.py runserver 0.0.0.0:8000`
 	return nil
 }
 
-func javaDocker(filename string) error {
-	const content = `
+func javaDocker(filename string, projectPath string) error {
+	type Param struct {
+		ProjectPath string
+	}
+
+	param := &Param{ProjectPath: "*"}
+	if len(strings.Trim(projectPath, "")) > 0 {
+		param.ProjectPath = projectPath
+	}
+
+	var javaMavenDockerfileContentTpl = `
 # Step : Test and package
 FROM harbor.ym/devops/maven363:latest as builder
 WORKDIR /build
@@ -222,9 +234,14 @@ RUN mvn install
 
 # # Step : Package image
 FROM harbor.ym/devops/openjdk8:latest
-COPY --from=builder /build/*/target/* /app/
+COPY --from=builder /build/{{.ProjectPath}}/target/* /app/
 ENTRYPOINT ["/app/bin/run.sh"]
 `
+
+	content, err := Render(param, javaMavenDockerfileContentTpl)
+	if err != nil {
+		panic(err)
+	}
 
 	const xmlContent = `
 <?xml version="1.0" encoding="UTF-8"?>
@@ -554,6 +571,7 @@ under the License.
   </activeProfiles>
   -->
 </settings>`
+
 	if _, err := os.Stat(filename); os.IsNotExist(err) {
 		err = utils.GenerateFile(filename, content)
 		if err != nil {
@@ -570,7 +588,6 @@ under the License.
 	}
 	return nil
 }
-
 
 func easyswooleDocker(filename string) error {
 	const content = `
