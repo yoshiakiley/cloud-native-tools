@@ -12,7 +12,7 @@ func Test_CheckDockerFile(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = CheckDockerFile(dir, "django")
+	err = CheckDockerFile(dir, "django", "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -51,17 +51,17 @@ func Test_webDocker(t *testing.T) {
 	}
 }
 
-func Test_easyswooleDocker(t *testing.T)  {
+func Test_easyswooleDocker(t *testing.T) {
 	dockerfile := "./Dockerfile"
 	err := easyswooleDocker(dockerfile)
-	if err != nil{
+	if err != nil {
 		t.Fatal(err)
-	}else {
+	} else {
 		defer os.Remove(dockerfile)
 	}
 
 	var exist = true
-	if _,err := os.Stat(dockerfile); os.IsNotExist(err){
+	if _, err := os.Stat(dockerfile); os.IsNotExist(err) {
 		exist = false
 	}
 	if !exist {

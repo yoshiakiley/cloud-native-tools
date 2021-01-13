@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/yametech/cloud-native-tools/pkg/utils"
+	utils "github.com/yametech/cloud-native-tools/pkg/utils"
 	"html/template"
 	"io"
 	"io/ioutil"
