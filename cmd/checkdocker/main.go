@@ -228,9 +228,9 @@ ADD settings.xml /root/.m2/settings.xml
 ADD pom.xml pom.xml
 RUN mvn verify clean --fail-never
 
-# add code build
+# add code build don't not use install
 ADD . .
-RUN mvn install
+RUN mvn package
 
 # # Step : Package image
 FROM harbor.ym/devops/openjdk8:latest
