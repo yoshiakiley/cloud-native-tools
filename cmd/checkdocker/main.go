@@ -15,7 +15,7 @@ func main() {
 	var codeType string
 	var projectPath string
 
-	flag.StringVar(&url, "url", "./", "-url ./")
+	flag.StringVar(&url, "url", "./Dockerfile", "-url ./")
 	flag.StringVar(&codeType, "codetype", "java-maven", "-codetype java-maven")
 	flag.StringVar(&projectPath, "path", "", "-path subdirectory")
 	flag.Parse()
@@ -28,7 +28,10 @@ func main() {
 }
 
 func CheckDockerFile(url string, codeType string, projectPath string) error {
-	url = path.Join(url, "Dockerfile")
+	count := strings.Index(url, "Dockerfile")
+	if count == -1{
+		url = path.Join(url, "Dockerfile")
+	}
 	switch codeType {
 	case "django":
 		err := djangoDocker(url)
