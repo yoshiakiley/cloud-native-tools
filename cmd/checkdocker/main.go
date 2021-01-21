@@ -229,11 +229,11 @@ FROM harbor.ym/devops/maven363:latest as builder
 WORKDIR /build
 ADD settings.xml /root/.m2/settings.xml
 ADD pom.xml pom.xml
-RUN mvn verify clean --fail-never
+#RUN mvn verify clean --fail-never
 
 # add code build don't not use install
 ADD . .
-RUN mvn package
+RUN mvn clean package
 
 # # Step : Package image
 FROM harbor.ym/devops/openjdk8:latest
