@@ -11,25 +11,27 @@ import (
 )
 
 func main() {
-	var url string
-	var codeType string
-	var projectPath string
+	var url, codeType, projectPath, command string
 	var unitTest bool
 
 	flag.StringVar(&url, "url", "./Dockerfile", "-url ./")
 	flag.StringVar(&codeType, "codetype", "java-maven", "-codetype java-maven")
 	flag.StringVar(&projectPath, "path", "", "-path subdirectory")
+	flag.StringVar(&command, "command", "", "-Command go")
 	flag.BoolVar(&unitTest, "unittest", false, "-unittest True")
 	flag.Parse()
 
-	fmt.Printf("url=%v  codeType=%v\n", url, codeType)
-	err := CheckDockerFile(url, codeType, projectPath, unitTest)
+	fmt.Printf("url=%v  codeType=%v ", url, codeType)
+	if unitTest {
+		fmt.Printf("unitTest command:%s\n", url, codeType, command)
+	}
+	err := CheckDockerFile(url, codeType, projectPath, unitTest, command)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func CheckDockerFile(url string, codeType string, projectPath string, unitTest bool) error {
+func CheckDockerFile(url, codeType, projectPath string, unitTest bool, command string) error {
 	count := strings.Index(url, "Dockerfile")
 	if count == -1 {
 		url = path.Join(url, "Dockerfile")
@@ -41,7 +43,7 @@ func CheckDockerFile(url string, codeType string, projectPath string, unitTest b
 			return err
 		}
 	case "java-maven":
-		err := javaDocker(url, projectPath, unitTest)
+		err := javaDocker(url, projectPath, unitTest, command)
 		if err != nil {
 			return err
 		}
@@ -88,18 +90,25 @@ func djangoDocker(filename string) error {
 	return nil
 }
 
-func javaDocker(filename string, projectPath string, unitTest bool) error {
+func javaDocker(filename, projectPath string, unitTest bool, command string) error {
 	type Param struct {
 		ProjectPath string
-		SkipTest   	string
+		SkipTest    string
+		Command     string
 	}
 
-	param := &Param{ProjectPath: "*",SkipTest:""}
+	param := &Param{ProjectPath: "*", SkipTest: ""}
 	if len(strings.Trim(projectPath, "")) > 0 {
 		param.ProjectPath = projectPath
 	}
-	if unitTest{
+	if unitTest {
 		param.SkipTest = "-Dmaven.test.skip=true"
+		if len(command) != 0 {
+			param.Command = command
+		} else {
+			param.Command = "mvn test"
+		}
+
 	}
 
 	content, err := Render(param, javaMavenDockerfileContentTpl)
@@ -128,7 +137,8 @@ func javaDocker(filename string, projectPath string, unitTest bool) error {
 		unitDockerfile := strings.Join(unitList, "/")
 		unitDockerfile = fmt.Sprintf("%s/%s", unitDockerfile, "Dockerfile-unittest")
 
-		err = utils.GenerateFile(unitDockerfile, javaMavenUnitContent)
+		content, err := Render(param, javaMavenUnitContent)
+		err = utils.GenerateFile(unitDockerfile, content)
 		if err != nil {
 			return err
 		}

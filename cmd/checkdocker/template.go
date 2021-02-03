@@ -37,7 +37,7 @@ ADD pom.xml pom.xml
 
 # add code build don't not use install
 ADD . .
-RUN mvn test
+RUN {{.Command}}
 `
 
 	javaXmlContent = `
