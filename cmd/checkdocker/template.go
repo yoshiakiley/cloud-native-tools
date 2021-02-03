@@ -19,7 +19,7 @@ ADD pom.xml pom.xml
 
 # add code build don't not use install
 ADD . .
-RUN mvn package -Dmaven.test.skip=true
+RUN mvn package {{.SkipTest}}
 RUN mvn clean package
 
 # # Step : Package image

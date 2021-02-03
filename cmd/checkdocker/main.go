@@ -91,11 +91,15 @@ func djangoDocker(filename string) error {
 func javaDocker(filename string, projectPath string, unitTest bool) error {
 	type Param struct {
 		ProjectPath string
+		SkipTest   	string
 	}
 
-	param := &Param{ProjectPath: "*"}
+	param := &Param{ProjectPath: "*",SkipTest:""}
 	if len(strings.Trim(projectPath, "")) > 0 {
 		param.ProjectPath = projectPath
+	}
+	if unitTest{
+		param.SkipTest = "-Dmaven.test.skip=true"
 	}
 
 	content, err := Render(param, javaMavenDockerfileContentTpl)
