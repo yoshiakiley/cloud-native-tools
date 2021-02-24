@@ -12,29 +12,37 @@ import (
 
 func main() {
 	var url, codeType, projectPath, command string
-	var unitTest bool
+	var unitTest, sonar bool
 
 	flag.StringVar(&url, "url", "./Dockerfile", "-url ./")
 	flag.StringVar(&codeType, "codetype", "java-maven", "-codetype java-maven")
 	flag.StringVar(&projectPath, "path", "", "-path subdirectory")
 	flag.StringVar(&command, "command", "", "-Command go")
 	flag.BoolVar(&unitTest, "unittest", false, "-unittest True")
+	flag.BoolVar(&sonar, "sonar", false, "-sonar True")
 	flag.Parse()
 
 	fmt.Printf("url=%v  codeType=%v ", url, codeType)
 	if unitTest {
 		fmt.Printf("unitTest command:%s\n", url, codeType, command)
 	}
-	err := CheckDockerFile(url, codeType, projectPath, unitTest, command)
+	err := CheckDockerFile(url, codeType, projectPath, unitTest, command, sonar)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func CheckDockerFile(url, codeType, projectPath string, unitTest bool, command string) error {
+func CheckDockerFile(url, codeType, projectPath string, unitTest bool, command string, sonar bool) error {
 	count := strings.Index(url, "Dockerfile")
 	if count == -1 {
 		url = path.Join(url, "Dockerfile")
+	}
+	if sonar {
+		err := sonarDocker(url, command)
+		if err != nil {
+			return err
+		}
+		return nil
 	}
 	switch codeType {
 	case "django":
@@ -59,6 +67,20 @@ func CheckDockerFile(url, codeType, projectPath string, unitTest bool, command s
 		}
 	}
 
+	return nil
+}
+
+func sonarDocker(url, projectName string) error {
+	url = "/workspace/git/Dockerfile"
+	type Param struct {
+		Command string
+	}
+	param := &Param{Command: projectName}
+	content, err := Render(param, sonarContent)
+	err = utils.GenerateFile(url, content)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
