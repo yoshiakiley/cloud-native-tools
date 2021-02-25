@@ -38,7 +38,7 @@ func CheckDockerFile(url, codeType, projectPath string, unitTest bool, command s
 		url = path.Join(url, "Dockerfile")
 	}
 	if sonar {
-		fmt.Printf("enter sonar mode")
+		fmt.Printf("enter sonar mode\n")
 		err := sonarDocker(url, command)
 		if err != nil {
 			return err
@@ -76,7 +76,7 @@ func sonarDocker(url, projectName string) error {
 	type Param struct {
 		Command string
 	}
-	fmt.Printf("%s", projectName)
+	fmt.Printf("project name: %s\n", projectName)
 	param := &Param{Command: projectName}
 	_ = param
 	content, err := Render(param, sonarContent)
