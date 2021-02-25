@@ -39,7 +39,7 @@ func CheckDockerFile(url, codeType, projectPath string, unitTest bool, command s
 	}
 	if sonar {
 		fmt.Printf("enter sonar mode\n")
-		err := sonarDocker(url, command)
+		err := sonarDocker(url, codeType)
 		if err != nil {
 			return err
 		}
