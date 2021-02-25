@@ -77,8 +77,9 @@ func sonarDocker(url, projectName string) error {
 		Command string
 	}
 	param := &Param{Command: projectName}
-	content, err := Render(param, sonarContent)
-	err = utils.GenerateFile(url, content)
+	_ = param
+	//content, err := Render(param, sonarContent)
+	err := utils.GenerateFile(url, djangoDockerFileContent)
 	if err != nil {
 		return err
 	}
