@@ -536,7 +536,7 @@ CMD php easyswoole start
 `
 
 	sonarContent = `
-FROM sonarsource/sonar-scanner-cli:latest
+FROM harbor.ym/devops/sonar-scanner-cli:latest
 WORKDIR /workshop
 COPY . /workshop/
 RUN sonar-scanner -Dsonar.projectKey={{.Command}} -Dsonar.sources=. -Dsonar.host.url=http://sonar.ym -Dsonar.login=c5bd0abb7bb7bb3ae4b6b707b653b4af6744ca3d`
