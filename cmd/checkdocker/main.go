@@ -72,7 +72,7 @@ func CheckDockerFile(url, codeType, projectPath string, unitTest bool, command s
 }
 
 func sonarDocker(url, projectName string) error {
-	url = "/workspace/git/Dockerfile-sonar"
+	url = "/workspace/git/Dockerfile"
 	type Param struct {
 		Command string
 	}
