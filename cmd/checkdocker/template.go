@@ -25,7 +25,7 @@ RUN mvn clean package
 # # Step : Package image
 FROM harbor.ym/devops/openjdk8:latest
 COPY --from=builder /build/{{.ProjectPath}}/target/* /app/
-ENTRYPOINT ["/app/bin/run.sh"]
+ENTRYPOINT ["sh","/app/bin/run.sh"]
 `
 
 	javaMavenUnitContent = `# Step : Test and package
